@@ -14,15 +14,24 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: 'index.html',
+      inject: false,
     }),
   ],
+  watchOptions: {
+    poll: 1000,
+  },
   devServer: {
+    hot: true,
     contentBase: './dist',
+    historyApiFallback: true,
+    open: true,
+    compress: true,
+    port: 8080,
   },
   output: {
     clean: true,
   },
   resolve: {
-    extensions: ['.js', '.html']
-  }
+    extensions: ['.js', '.html'],
+  },
 };

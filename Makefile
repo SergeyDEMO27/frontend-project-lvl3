@@ -6,6 +6,6 @@ test:
 	npm test
 build:
 	rm -rf dist
-	NODE_ENV=production npx webpack
+	NODE_ENV=production npx webpack --watch
 develop:
 	npx webpack serve
