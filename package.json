@@ -25,6 +25,7 @@
     "@popperjs/core": "^2.9.2",
     "axios": "^0.21.1",
     "bootstrap": "^5.0.2",
+    "i18next": "^20.3.2",
     "jquery": "^3.6.0",
     "on-change": "^3.0.2",
     "yup": "^0.32.9"
