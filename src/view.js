@@ -125,7 +125,7 @@ export default (path, value, i18nInstance) => {
     return buttonPost;
   };
 
-  const renderPosts = (posts) => {
+  const renderPosts = (postsFeed) => {
     postsMain.innerHTML = '';
     const containerPosts = document.createElement('div');
     containerPosts.classList.add('card', 'border-0');
@@ -137,8 +137,8 @@ export default (path, value, i18nInstance) => {
     const listPosts = document.createElement('ul');
     listPosts.classList.add('list-group', 'border-0', 'rounded-0');
 
-    posts.forEach(({ postsFeed }) => {
-      postsFeed.forEach(({ titlePost, descriptionPost, linkPost }) => {
+    postsFeed.forEach(({ posts }) => {
+      posts.forEach(({ titlePost, descriptionPost, linkPost }) => {
         const refPost = makePostsLink(titlePost, linkPost);
         const buttonPost = makePostsButton(titlePost, descriptionPost, linkPost);
         refPost.append(buttonPost);

@@ -6,10 +6,10 @@ import render from './view';
 
 export default (i18nInstance) => {
   const formMain = document.querySelector('.rss-form');
+  const timeFeedsUpdate = 5000;
 
   const state = {
     formState: '',
-    // isValid: true,
     error: '',
     feeds: [],
     posts: [],
@@ -21,9 +21,6 @@ export default (i18nInstance) => {
   )}`;
 
   const watchedState = onChange(state, (path, value) => {
-    // console.log(path);
-    // console.log(value);
-    // console.log('!!!!!');
     render(path, value, i18nInstance);
   });
 
@@ -39,11 +36,40 @@ export default (i18nInstance) => {
     }
   };
 
+  const updatePosts = (watchState) => {
+    const { feedsOpened } = watchState;
+    const promises = feedsOpened.map((url) => axios.get(getUrlWithProxy(url))
+      .then((response) => {
+        const { postsFeed } = parse(response.data.contents);
+        const postsOld = state.posts.find(({ idFor }) => postsFeed.idFor === idFor);
+        const postsNew = postsFeed.posts
+          .filter((post) => postsOld.posts.every((postOld) => post.idPost !== postOld.idPost));
+        if (postsNew.length > 0) {
+          watchState.posts.forEach((post) => {
+            if (post.idFor === postsOld.ifFor) {
+              post.posts.unshift(...postsNew);
+            }
+          });
+        }
+      })
+      .catch((error) => {
+        watchedState.error = error.message;
+      }));
+
+    return Promise.all(promises);
+  };
+
+  const getFeedsUpdateTimer = (watchState) => {
+    setTimeout(() => updatePosts(watchState)
+      .finally(() => { getFeedsUpdateTimer(watchState); }), timeFeedsUpdate);
+  };
+
   const addFeed = ({
     idFeed, titleFeed, descriptionFeed, postsFeed,
   }) => {
+    const { idFor, posts } = postsFeed;
     watchedState.feeds.unshift({ idFeed, titleFeed, descriptionFeed });
-    watchedState.posts.unshift({ postsFeed });
+    watchedState.posts.unshift({ idFor, posts });
   };
 
   formMain.addEventListener('submit', (e) => {
@@ -54,7 +80,6 @@ export default (i18nInstance) => {
     watchedState.formState = 'loading';
     const error = urlValidate(url);
     if (!error) {
-      // watchedState.isValid = true;
       watchedState.error = '';
       const urlWithProxy = getUrlWithProxy(url);
       axios(urlWithProxy)
@@ -69,9 +94,10 @@ export default (i18nInstance) => {
           watchedState.formState = 'failed';
         });
     } else {
-      // watchedState.isValid = false;
       watchedState.error = error.message;
       watchedState.formState = 'failed';
     }
   });
+
+  getFeedsUpdateTimer(watchedState);
 };
