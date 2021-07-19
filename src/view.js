@@ -18,6 +18,8 @@ export default (path, value, i18nInstance) => {
       submitButtonMain.removeAttribute('disabled');
       feedbackMain.classList.add('text-success');
       feedbackMain.textContent = i18nInstance.t(formState);
+      formMain.reset();
+      inputMain.focus();
     }
     if (formState === 'loading') {
       inputMain.setAttribute('readonly', true);
@@ -83,8 +85,6 @@ export default (path, value, i18nInstance) => {
     containerTitleOfList.append(titleOfList);
     containerFeeds.append(containerTitleOfList, listFeeds);
     feedsMain.append(containerFeeds);
-    formMain.reset();
-    inputMain.focus();
   };
 
   const makePostsLink = (title, link) => {
