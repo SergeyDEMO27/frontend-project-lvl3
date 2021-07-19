@@ -3,10 +3,13 @@ import onChange from 'on-change';
 import axios from 'axios';
 import parse from './parser.js';
 import render from './view';
+import updatePosts from './updatePosts.js';
 
 export default (i18nInstance) => {
   const formMain = document.querySelector('.rss-form');
-  const timeFeedsUpdate = 5000;
+  const getUrlWithProxy = (url) => `https://hexlet-allorigins.herokuapp.com/get?url=${encodeURIComponent(
+    url,
+  )}`;
 
   const state = {
     formState: '',
@@ -15,10 +18,6 @@ export default (i18nInstance) => {
     posts: [],
     feedsOpened: [],
   };
-
-  const getUrlWithProxy = (url) => `https://hexlet-allorigins.herokuapp.com/get?url=${encodeURIComponent(
-    url,
-  )}`;
 
   const watchedState = onChange(state, (path, value) => {
     render(path, value, i18nInstance);
@@ -34,34 +33,6 @@ export default (i18nInstance) => {
     } catch (error) {
       return error;
     }
-  };
-
-  const updatePosts = (watchState) => {
-    const { feedsOpened } = watchState;
-    const promises = feedsOpened.map((url) => axios.get(getUrlWithProxy(url))
-      .then((response) => {
-        const { postsFeed } = parse(response.data.contents);
-        const postsOld = state.posts.find(({ idFor }) => postsFeed.idFor === idFor);
-        const postsNew = postsFeed.posts
-          .filter((post) => postsOld.posts.every((postOld) => post.idPost !== postOld.idPost));
-        if (postsNew.length > 0) {
-          watchState.posts.forEach((post) => {
-            if (post.idFor === postsOld.ifFor) {
-              post.posts.unshift(...postsNew);
-            }
-          });
-        }
-      })
-      .catch((error) => {
-        watchedState.error = error.message;
-      }));
-
-    return Promise.all(promises);
-  };
-
-  const getFeedsUpdateTimer = (watchState) => {
-    setTimeout(() => updatePosts(watchState)
-      .finally(() => { getFeedsUpdateTimer(watchState); }), timeFeedsUpdate);
   };
 
   const addFeed = ({
@@ -99,5 +70,5 @@ export default (i18nInstance) => {
     }
   });
 
-  getFeedsUpdateTimer(watchedState);
+  updatePosts(watchedState);
 };

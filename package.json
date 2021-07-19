@@ -1,8 +1,8 @@
 {
   "name": "@hexlet/code",
   "version": "1.0.0",
-  "description": "Hexlet 3",
-  "main": "src/index.js",
+  "description": "Rss-reader",
+  "main": "src/init.js",
   "scripts": {
     "test": "jest",
     "build": "webpack"

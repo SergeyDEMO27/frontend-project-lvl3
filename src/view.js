@@ -59,8 +59,8 @@ export default (path, value, i18nInstance) => {
     feedsMain.innerHTML = '';
     const containerFeeds = document.createElement('div');
     containerFeeds.classList.add('card', 'border-0');
-    const containerOfTitleOfList = document.createElement('div');
-    containerOfTitleOfList.classList.add('card-body');
+    const containerTitleOfList = document.createElement('div');
+    containerTitleOfList.classList.add('card-body');
     const titleOfList = document.createElement('h2');
     titleOfList.classList.add('card-title', 'h4');
     titleOfList.textContent = i18nInstance.t('feeds');
@@ -80,8 +80,8 @@ export default (path, value, i18nInstance) => {
       listFeeds.append(itemFeeds);
     });
 
-    containerOfTitleOfList.append(titleOfList);
-    containerFeeds.append(containerOfTitleOfList, listFeeds);
+    containerTitleOfList.append(titleOfList);
+    containerFeeds.append(containerTitleOfList, listFeeds);
     feedsMain.append(containerFeeds);
     formMain.reset();
     inputMain.focus();
@@ -99,8 +99,8 @@ export default (path, value, i18nInstance) => {
     );
     const linkPost = document.createElement('a');
     linkPost.classList.add('fw-bold');
-    linkPost.setAttribute('href', link);
     linkPost.textContent = trimmer(title);
+    linkPost.setAttribute('href', link);
     linkPost.setAttribute('target', '_blank');
     linkPost.setAttribute('rel', 'noopener noreferrer');
     linkPost.addEventListener('click', (e) => {
@@ -110,6 +110,12 @@ export default (path, value, i18nInstance) => {
     return itemPosts;
   };
 
+  const fillModal = (title, description, link) => {
+    modalTitle.textContent = trimmer(title);
+    modalBody.textContent = trimmer(description);
+    modalLink.setAttribute('href', link);
+  };
+
   const makePostsButton = (title, description, link) => {
     const buttonPost = document.createElement('button');
     buttonPost.classList.add('btn', 'btn-outline-primary', 'btn-sm');
@@ -117,9 +123,7 @@ export default (path, value, i18nInstance) => {
     buttonPost.setAttribute('data-bs-target', '#modal');
     buttonPost.textContent = i18nInstance.t('preview');
     buttonPost.addEventListener('click', () => {
-      modalTitle.textContent = trimmer(title);
-      modalBody.textContent = trimmer(description);
-      modalLink.setAttribute('href', link);
+      fillModal(title, description, link);
       buttonPost.closest('li').querySelector('a').className = 'fw-normal link-secondary';
     });
     return buttonPost;
@@ -129,8 +133,8 @@ export default (path, value, i18nInstance) => {
     postsMain.innerHTML = '';
     const containerPosts = document.createElement('div');
     containerPosts.classList.add('card', 'border-0');
-    const containerOfTitleOfList = document.createElement('div');
-    containerOfTitleOfList.classList.add('card-body');
+    const containerTitleOfList = document.createElement('div');
+    containerTitleOfList.classList.add('card-body');
     const titleOfList = document.createElement('h2');
     titleOfList.classList.add('card-title', 'h4');
     titleOfList.textContent = i18nInstance.t('posts');
@@ -146,8 +150,8 @@ export default (path, value, i18nInstance) => {
       });
     });
 
-    containerOfTitleOfList.append(titleOfList);
-    containerPosts.append(containerOfTitleOfList, listPosts);
+    containerTitleOfList.append(titleOfList);
+    containerPosts.append(containerTitleOfList, listPosts);
     postsMain.append(containerPosts);
   };
 
@@ -155,14 +159,14 @@ export default (path, value, i18nInstance) => {
     case 'formState':
       renderFormStateText(value);
       break;
+    case 'error':
+      renderError(value);
+      break;
     case 'feeds':
       renderFeeds(value);
       break;
     case 'posts':
       renderPosts(value);
-      break;
-    case 'error':
-      renderError(value);
       break;
     default:
       throw new Error(`Unknown state ${path}`);

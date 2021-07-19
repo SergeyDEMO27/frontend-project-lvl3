@@ -1,6 +1,6 @@
 import i18next from 'i18next';
 import app from './app.js';
-import resources from './locales/index.js';
+import resources from './locales/locale.js';
 import htmlTranslator from './htmlTranslate.js';
 
 export default () => {
