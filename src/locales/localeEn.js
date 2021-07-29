@@ -1,20 +1,17 @@
 export default {
   translation: {
-    'no-internet': 'Network Error',
-    double: 'Rss already exists',
-    url: 'Must be valid url',
-    'no-parse': "This source doesn't contain valid rss",
-    default: 'Something went wrong...',
-    successful: 'RSS loaded successfully',
-    mainTitle: 'RSS Reader',
-    promo: 'Start reading RSS today! It is easy, it is beautiful.',
-    placeholder: 'RSS link',
-    example: 'Example: https://ru.hexlet.io/lessons.rss',
-    addButton: 'Add',
-    preview: 'Preview',
-    posts: 'Posts',
-    feeds: 'Feeds',
-    modalMore: 'Full article',
-    modalClose: 'Close',
+    form: {
+      successful: 'RSS loaded successfully',
+      preview: 'Preview',
+      posts: 'Posts',
+      feeds: 'Feeds',
+    },
+    errors: {
+      'no-internet': 'Network Error',
+      double: 'Rss already exists',
+      url: 'Must be valid url',
+      'no-parse': "This source doesn't contain valid rss",
+      default: 'Something went wrong...',
+    },
   },
 };

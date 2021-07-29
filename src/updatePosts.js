@@ -1,35 +1,32 @@
 import axios from 'axios';
+import _ from 'lodash';
 import parse from './parser.js';
+import getUrlWithProxy from './urlProxy.js';
 
-const getUrlWithProxy = (url) => `https://hexlet-allorigins.herokuapp.com/get?url=${encodeURIComponent(
-  url,
-)}`;
-const timeFeedsUpdate = 5000;
+const feedsUpdateTimeout = 5000;
 
 const updatePosts = (state) => {
-  const { feedsOpened } = state;
-  const promises = feedsOpened.map((url) => axios.get(getUrlWithProxy(url))
+  const { openedFeeds } = state;
+  const promises = openedFeeds.map((url) => axios.get(getUrlWithProxy(url))
     .then((response) => {
-      const { postsFeed } = parse(response.data.contents);
-      const postsOld = state.posts.find(({ idFor }) => postsFeed.idFor === idFor);
-      const postsNew = postsFeed.posts
-        .filter((post) => postsOld.posts.every((postOld) => post.idPost !== postOld.idPost));
-      if (postsNew.length > 0) {
-        state.posts.forEach((post) => {
-          if (post.idFor === postsOld.ifFor) {
-            post.posts.unshift(...postsNew);
-          }
-        });
-      }
+      const newPosts = parse(response.data.contents);
+      const oldPosts = state.posts.find(({ id }) => newPosts.id === id);
+      state.posts.forEach((item) => {
+        if (item.id === newPosts.id) {
+          item = Object.assign(item, ...(_.uniqBy([oldPosts, newPosts], 'id')));
+        }
+      });
     })
-    .catch(() => {
+    .catch((error) => {
+      console.error(error);
     }));
   return Promise.all(promises);
 };
 
 const getFeedsUpdateTimer = (state) => {
   setTimeout(() => updatePosts(state)
-    .finally(() => { getFeedsUpdateTimer(state); }), timeFeedsUpdate);
+    .finally(() => { getFeedsUpdateTimer(state); }),
+  feedsUpdateTimeout);
 };
 
 export default getFeedsUpdateTimer;
