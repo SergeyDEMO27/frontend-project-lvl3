@@ -5,6 +5,7 @@ import parse from './parser.js';
 import render from './view';
 import updatePosts from './updatePosts.js';
 import getUrlWithProxy from './urlProxy.js';
+import { messagePath } from './util.js';
 
 export default (i18nInstance, elements) => {
   const formMain = document.querySelector('.rss-form');
@@ -22,14 +23,15 @@ export default (i18nInstance, elements) => {
   });
 
   const urlValidate = (url) => {
-    const urlCheck = yup.string().url().required();
-    const doubleCheck = yup.mixed().notOneOf(state.openedFeeds, 'this must not be a double');
+    const urlCheck = yup.string().url(i18nInstance.t(messagePath.url)).required();
+    const doubleCheck = yup
+      .mixed().notOneOf(state.openedFeeds, i18nInstance.t(messagePath.duplicateUrl));
     try {
       urlCheck.validateSync(url, { abortEarly: false });
       doubleCheck.validateSync(url, { abortEarly: false });
       return null;
     } catch (error) {
-      return error;
+      return error.message;
     }
   };
 
@@ -48,13 +50,13 @@ export default (i18nInstance, elements) => {
     watchedState.formState = 'loading';
     const error = urlValidate(url);
     if (error) {
-      watchedState.error = error.message;
+      watchedState.error = error;
       watchedState.formState = 'failed';
       return;
     }
     watchedState.error = '';
     const urlWithProxy = getUrlWithProxy(url);
-    axios(urlWithProxy)
+    axios.get(urlWithProxy)
       .then((response) => {
         const feed = parse(response.data.contents);
         addFeed(feed);
@@ -62,7 +64,13 @@ export default (i18nInstance, elements) => {
         watchedState.formState = 'successful';
       })
       .catch((err) => {
-        watchedState.error = err.message;
+        if (err.isAxiosError) {
+          watchedState.error = messagePath.networkError;
+        } else if (err.isParseError) {
+          watchedState.error = messagePath.parseError;
+        } else {
+          watchedState.error = messagePath.defaultError;
+        }
         watchedState.formState = 'failed';
       });
   });

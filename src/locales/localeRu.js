@@ -7,11 +7,11 @@ export default {
       feeds: 'Фиды',
     },
     errors: {
-      'no-internet': 'Ошибка сети',
-      double: 'RSS уже существует',
+      networkError: 'Ошибка сети',
+      duplicate: 'RSS уже существует',
       url: 'Ссылка должна быть валидным URL',
-      'no-parse': 'Ресурс не содержит валидный RSS',
-      default: 'Что-то пошло не так...',
+      parseError: 'Ресурс не содержит валидный RSS',
+      defaultError: 'Что-то пошло не так...',
     },
   },
 };

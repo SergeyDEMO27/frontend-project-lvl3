@@ -17,6 +17,6 @@ export default (stringXml) => {
     };
   } catch (error) {
     console.error(error);
-    throw new Error('no-parse');
+    throw new Error('parse Error');
   }
 };

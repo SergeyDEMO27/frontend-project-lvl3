@@ -1,6 +1,7 @@
 export default (path, value, i18nInstance, elements) => {
-  const renderFormStateText = (formState) => {
+  const renderFormState = (formState) => {
     elements.feedbackMain.classList.remove('text-success', 'text', 'text-danger');
+    elements.inputMain.classList.remove('is-invalid');
     if (formState === 'successful') {
       elements.inputMain.removeAttribute('readonly');
       elements.submitButtonMain.removeAttribute('disabled');
@@ -17,35 +18,15 @@ export default (path, value, i18nInstance, elements) => {
     }
     if (formState === 'failed') {
       elements.inputMain.removeAttribute('readonly');
+      elements.inputMain.classList.add('is-invalid');
       elements.submitButtonMain.removeAttribute('disabled');
       elements.feedbackMain.classList.add('text-danger');
     }
   };
 
-  const getErrorMessage = (error) => {
-    switch (error) {
-      case 'this must be a valid URL':
-        return i18nInstance.t('errors.url');
-      case 'Network Error':
-        return i18nInstance.t('errors.no-internet');
-      case 'this must not be a double':
-        return i18nInstance.t('errors.double');
-      case 'no-parse':
-        return i18nInstance.t('errors.no-parse');
-      default:
-        return i18nInstance.t('errors.default');
-    }
-  };
-
-  const renderError = (err) => {
-    if (err) {
-      const error = getErrorMessage(err);
+  const renderError = (error) => {
+    if (error) {
       elements.feedbackMain.textContent = error;
-      elements.inputMain.className = 'form-control w-100 is-invalid';
-      elements.feedbackMain.className = 'feedback m-0 position-absolute small text-danger';
-    } else {
-      elements.inputMain.className = 'form-control w-100';
-      elements.feedbackMain.className = 'feedback m-0 position-absolute small text-success';
     }
   };
 
@@ -106,7 +87,7 @@ export default (path, value, i18nInstance, elements) => {
     elements.modalLink.setAttribute('href', link);
   };
 
-  const makePostsButton = (title, description, link) => {
+  const makePostButton = (title, description, link) => {
     const buttonPost = document.createElement('button');
     buttonPost.classList.add('btn', 'btn-outline-primary', 'btn-sm');
     buttonPost.setAttribute('data-bs-toggle', 'modal');
@@ -114,7 +95,6 @@ export default (path, value, i18nInstance, elements) => {
     buttonPost.textContent = i18nInstance.t('form.preview');
     buttonPost.addEventListener('click', () => {
       fillModal(title, description, link);
-      buttonPost.closest('li').querySelector('a').className = 'fw-normal link-secondary';
     });
     return buttonPost;
   };
@@ -132,14 +112,15 @@ export default (path, value, i18nInstance, elements) => {
     listPosts.classList.add('list-group', 'border-0', 'rounded-0');
 
     listPosts.addEventListener('click', (e) => {
-      if (e.target.dataset.id === 'link') {
-        e.target.className = 'fw-normal link-secondary';
+      if (e.target.tagName === 'A' || e.target.tagName === 'BUTTON') {
+        const currentLink = e.target.parentNode.querySelector('[data-id="link"]');
+        currentLink.className = 'fw-normal link-secondary';
       }
     });
 
     postsFeed.map(({ posts }) => posts.forEach(({ title, description, link }) => {
       const refPost = makePostsLink(title, link);
-      const buttonPost = makePostsButton(title, description, link);
+      const buttonPost = makePostButton(title, description, link);
       refPost.append(buttonPost);
       listPosts.append(refPost);
     }));
@@ -149,20 +130,12 @@ export default (path, value, i18nInstance, elements) => {
     elements.postsMain.append(containerPosts);
   };
 
-  switch (path) {
-    case 'formState':
-      renderFormStateText(value);
-      break;
-    case 'error':
-      renderError(value);
-      break;
-    case 'feeds':
-      renderFeeds(value);
-      break;
-    case 'posts':
-      renderPosts(value);
-      break;
-    default:
-      throw new Error(`Unknown state ${path}`);
-  }
+  const viewsMap = {
+    formState: renderFormState,
+    error: renderError,
+    feeds: renderFeeds,
+    posts: renderPosts,
+  };
+
+  viewsMap[path]?.(value);
 };

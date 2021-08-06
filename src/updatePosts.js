@@ -10,12 +10,14 @@ const updatePosts = (state) => {
   const promises = openedFeeds.map((url) => axios.get(getUrlWithProxy(url))
     .then((response) => {
       const newPosts = parse(response.data.contents);
-      const oldPosts = state.posts.find(({ id }) => newPosts.id === id);
-      state.posts.forEach((item) => {
-        if (item.id === newPosts.id) {
-          item = Object.assign(item, ...(_.uniqBy([oldPosts, newPosts], 'id')));
+      const oldPosts = state.posts.filter(({ id }) => newPosts.id === id);
+      state.posts.reduce((accumulator, post) => {
+        if (post.id === newPosts.id) {
+          const uniquePosts = _.uniqBy([oldPosts, newPosts], 'id');
+          return { ...post, ...uniquePosts };
         }
-      });
+        return post;
+      }, []);
     })
     .catch((error) => {
       console.error(error);
