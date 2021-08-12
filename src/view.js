@@ -92,6 +92,7 @@ export default (path, value, i18nInstance, elements) => {
     buttonPost.classList.add('btn', 'btn-outline-primary', 'btn-sm');
     buttonPost.setAttribute('data-bs-toggle', 'modal');
     buttonPost.setAttribute('data-bs-target', '#modal');
+    buttonPost.dataset.id = 'button';
     buttonPost.textContent = i18nInstance.t('form.preview');
     buttonPost.addEventListener('click', () => {
       fillModal(title, description, link);
@@ -112,7 +113,7 @@ export default (path, value, i18nInstance, elements) => {
     listPosts.classList.add('list-group', 'border-0', 'rounded-0');
 
     listPosts.addEventListener('click', (e) => {
-      if (e.target.tagName === 'A' || e.target.tagName === 'BUTTON') {
+      if (e.target.hasAttribute('data-id')) {
         const currentLink = e.target.parentNode.querySelector('[data-id="link"]');
         currentLink.className = 'fw-normal link-secondary';
       }

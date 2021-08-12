@@ -5,7 +5,7 @@ import parse from './parser.js';
 import render from './view';
 import updatePosts from './updatePosts.js';
 import getUrlWithProxy from './urlProxy.js';
-import { messagePath } from './util.js';
+import messagePath from './util.js';
 
 export default (i18nInstance, elements) => {
   const formMain = document.querySelector('.rss-form');
@@ -23,12 +23,21 @@ export default (i18nInstance, elements) => {
   });
 
   const urlValidate = (url) => {
-    const urlCheck = yup.string().url(i18nInstance.t(messagePath.url)).required();
-    const doubleCheck = yup
-      .mixed().notOneOf(state.openedFeeds, i18nInstance.t(messagePath.duplicateUrl));
+    yup.setLocale({
+      string: {
+        url: i18nInstance.t(messagePath.url),
+      },
+      mixed: {
+        notOneOf: i18nInstance.t(messagePath.duplicateUrl),
+      },
+    });
+
+    const urlCheck = yup.string().url().required();
+    const doubleUrlCheck = yup
+      .mixed().notOneOf(state.openedFeeds);
     try {
       urlCheck.validateSync(url, { abortEarly: false });
-      doubleCheck.validateSync(url, { abortEarly: false });
+      doubleUrlCheck.validateSync(url, { abortEarly: false });
       return null;
     } catch (error) {
       return error.message;
@@ -65,11 +74,11 @@ export default (i18nInstance, elements) => {
       })
       .catch((err) => {
         if (err.isAxiosError) {
-          watchedState.error = messagePath.networkError;
+          watchedState.error = i18nInstance.t(messagePath.networkError);
         } else if (err.isParseError) {
-          watchedState.error = messagePath.parseError;
+          watchedState.error = i18nInstance.t(messagePath.parseError);
         } else {
-          watchedState.error = messagePath.defaultError;
+          watchedState.error = i18nInstance.t(messagePath.defaultError);
         }
         watchedState.formState = 'failed';
       });
