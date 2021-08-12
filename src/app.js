@@ -32,7 +32,7 @@ export default (i18nInstance, elements) => {
       },
     });
 
-    const urlCheck = yup.string().required().url();
+    const urlCheck = yup.string().url().required();
     const doubleUrlCheck = yup.mixed().notOneOf(state.openedFeeds);
     try {
       urlCheck.validateSync(url, { abortEarly: false });
