@@ -32,9 +32,8 @@ export default (i18nInstance, elements) => {
       },
     });
 
-    const urlCheck = yup.string().url().required();
-    const doubleUrlCheck = yup
-      .mixed().notOneOf(state.openedFeeds);
+    const urlCheck = yup.string().required().url();
+    const doubleUrlCheck = yup.mixed().notOneOf(state.openedFeeds);
     try {
       urlCheck.validateSync(url, { abortEarly: false });
       doubleUrlCheck.validateSync(url, { abortEarly: false });
@@ -55,14 +54,13 @@ export default (i18nInstance, elements) => {
     e.preventDefault();
     const data = new FormData(e.target);
     const url = data.get('url').trim();
-
-    watchedState.formState = 'loading';
     const error = urlValidate(url);
     if (error) {
       watchedState.error = error;
       watchedState.formState = 'failed';
       return;
     }
+    watchedState.formState = 'loading';
     watchedState.error = '';
     const urlWithProxy = getUrlWithProxy(url);
     axios.get(urlWithProxy)
