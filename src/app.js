@@ -67,6 +67,9 @@ export default (i18nInstance, elements) => {
     axios.get(urlWithProxy)
       .then((response) => {
         const feed = parse(response.data.contents);
+        if (feed.error) {
+          throw (feed.error);
+        }
         addFeed(feed);
         state.openedFeeds.push(url);
         watchedState.formState = 'successful';
