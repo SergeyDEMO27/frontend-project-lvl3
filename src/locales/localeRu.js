@@ -10,6 +10,7 @@ export default {
       networkError: 'Ошибка сети',
       duplicate: 'RSS уже существует',
       url: 'Ссылка должна быть валидным URL',
+      emptyUrl: 'Не должно быть пустым',
       parseError: 'Ресурс не содержит валидный RSS',
       defaultError: 'Что-то пошло не так...',
     },

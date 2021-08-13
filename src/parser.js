@@ -18,7 +18,7 @@ export default (stringXml) => {
       items: Array.from(parsedXml.querySelectorAll('item')).map(getPost),
     };
   } catch (err) {
-    console.error(err);
-    throw new Error('parse Error');
+    err.isRssParseError = true;
+    return { items: null, error: err };
   }
 };
