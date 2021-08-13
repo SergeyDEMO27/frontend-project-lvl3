@@ -22,21 +22,34 @@ export default (i18nInstance, elements) => {
     render(path, value, i18nInstance, elements);
   });
 
-  const urlValidate = (url) => {
-    yup.setLocale({
-      string: {
-        url: i18nInstance.t(messagePath.url),
-      },
-      mixed: {
-        notOneOf: i18nInstance.t(messagePath.duplicateUrl),
-      },
-    });
+  // const urlValidate = (url) => {
+  //   // yup.setLocale({
+  //   //   string: {
+  //   //     url: i18nInstance.t(messagePath.url),
+  //   //   },
+  //   //   mixed: {
+  //   //     notOneOf: i18nInstance.t(messagePath.duplicateUrl),
+  //   //   },
+  //   // });
 
-    const urlCheck = yup.string().url().required();
-    const doubleUrlCheck = yup.mixed().notOneOf(state.openedFeeds);
+  //   const urlCheck = yup.string().url().required();
+  //   const doubleUrlCheck = yup.mixed().notOneOf(state.openedFeeds);
+  //   try {
+  //     urlCheck.validateSync(url, { abortEarly: false });
+  //     doubleUrlCheck.validateSync(url, { abortEarly: false });
+  //     return null;
+  //   } catch (error) {
+  //     return error.message;
+  //   }
+  // };
+
+  const urlValidate = (url) => {
+    const urlCheck = yup.string().url(i18nInstance.t(messagePath.url)).required();
+    const doubleCheck = yup
+      .mixed().notOneOf(state.openedFeeds, i18nInstance.t(messagePath.duplicateUrl));
     try {
       urlCheck.validateSync(url, { abortEarly: false });
-      doubleUrlCheck.validateSync(url, { abortEarly: false });
+      doubleCheck.validateSync(url, { abortEarly: false });
       return null;
     } catch (error) {
       return error.message;
