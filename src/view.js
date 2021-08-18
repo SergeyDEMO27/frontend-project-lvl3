@@ -26,7 +26,7 @@ export default (path, value, i18nInstance, elements) => {
 
   const renderError = (error) => {
     if (error) {
-      elements.feedbackMain.textContent = error;
+      elements.feedbackMain.textContent = i18nInstance.t(error);
     }
   };
 

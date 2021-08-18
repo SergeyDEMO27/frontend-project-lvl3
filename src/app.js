@@ -1,6 +1,7 @@
 import * as yup from 'yup';
 import onChange from 'on-change';
 import axios from 'axios';
+import _ from 'lodash';
 import parse from './parser.js';
 import render from './view';
 import updatePosts from './updatePosts.js';
@@ -25,11 +26,11 @@ export default (i18nInstance, elements) => {
   const urlValidate = (url) => {
     yup.setLocale({
       string: {
-        url: i18nInstance.t(messagePath.url),
+        url: messagePath.url,
       },
       mixed: {
-        notOneOf: i18nInstance.t(messagePath.duplicateUrl),
-        required: i18nInstance.t(messagePath.emptyUrl),
+        notOneOf: messagePath.duplicateUrl,
+        required: messagePath.emptyUrl,
       },
     });
 
@@ -44,11 +45,19 @@ export default (i18nInstance, elements) => {
     }
   };
 
+  const addIdToPosts = (posts) => {
+    const postsWithId = _.cloneDeep(posts).map((post) => {
+      post.id = _.uniqueId();
+      return post;
+    });
+    return postsWithId;
+  };
+
   const addFeed = ({
-    id, title, description, items,
+    title, description, items,
   }) => {
-    watchedState.feeds.unshift({ id, title, description });
-    watchedState.posts.unshift({ id, posts: items });
+    watchedState.feeds.unshift({ id: _.uniqueId(), title, description });
+    watchedState.posts.unshift({ posts: addIdToPosts(items) });
   };
 
   formMain.addEventListener('submit', (e) => {
@@ -67,20 +76,17 @@ export default (i18nInstance, elements) => {
     axios.get(urlWithProxy)
       .then((response) => {
         const feed = parse(response.data.contents);
-        if (feed.error) {
-          throw (feed.error);
-        }
         addFeed(feed);
         state.openedFeeds.push(url);
         watchedState.formState = 'successful';
       })
       .catch((err) => {
         if (err.isAxiosError) {
-          watchedState.error = i18nInstance.t(messagePath.networkError);
+          watchedState.error = messagePath.networkError;
         } else if (err.isParseError) {
-          watchedState.error = i18nInstance.t(messagePath.parseError);
+          watchedState.error = messagePath.parseError;
         } else {
-          watchedState.error = i18nInstance.t(messagePath.defaultError);
+          watchedState.error = messagePath.defaultError;
         }
         watchedState.formState = 'failed';
       });
